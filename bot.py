@@ -1,11 +1,13 @@
 import os
 import asyncio
 import logging
+from datetime import date
 
 from aiogram import F, Bot, Dispatcher, types
 from aiogram.filters.command import Command
 from dotenv import load_dotenv
 
+import db
 import kb
 import gotten_horoscope
 
@@ -32,7 +34,11 @@ async def get_horoscope(msg: types.Message):
     try:
         sign_name = sign_names[msg.text]
         personal_horoscope = gotten_horoscope.today_horo[sign_name]
-        await msg.answer(text=personal_horoscope)
+        if not db.create_user(msg.chat.id, sign_name):
+            db.change_sign(msg.chat.id, sign_name)
+        today = date.today()
+        await msg.answer(text=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
+                         reply_markup=kb.refresh, parse_mode='html')
     except KeyError:
         await msg.answer(text='Неверная команда')
         await start(msg)
