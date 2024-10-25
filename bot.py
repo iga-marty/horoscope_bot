@@ -23,6 +23,9 @@ async def start(msg: types.Message):
 
 
 
+async def get_xml_horoscope():
+    pass
+
 async def main():
     await dp.start_polling(bot)
 

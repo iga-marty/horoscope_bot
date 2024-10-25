@@ -15,7 +15,7 @@ db = SqliteDatabase('db.sqlite')
 class User(Model):
     # user data
     user_id = IntegerField(primary_key=True)
-    zodiac_sign = TextField(null=False)
+    zodiac_sign = TextField()
 
 
     class Meta:
@@ -23,8 +23,14 @@ class User(Model):
         database = db
 
 
+class Horoscope(Model):
+    zodiac_sign = TextField(primary_key=True)
+    today_horoscope = TextField(default='')
+
+
 cursor = db.cursor()
 User.create_table()
+Horoscope.create_table()
 
 
 def create_user(chat_id, sign):
