@@ -22,12 +22,6 @@ async def start(msg: types.Message):
     await msg.answer(text='Выберите свой знак зодиака:', reply_markup=kb.menu)
 
 
-async def pprr(chat_id):
-    await bot.send_message(chat_id, ':gemini:')
-
-
-pprr(260143685)
-
 
 async def main():
     await dp.start_polling(bot)
