@@ -26,7 +26,6 @@ commands = ('/start',)
 
 today_horoscope = dict(gotten_horoscope.today_horo)
 
-
 @dp.message(Command('start'))
 async def start(msg: types.Message):
     # await msg.delete()
