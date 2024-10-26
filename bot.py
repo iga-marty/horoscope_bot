@@ -36,21 +36,12 @@ async def start(msg: types.Message):
 
 @dp.message(lambda query: query.text in sign_names.keys())
 async def get_horoscope(msg: types.Message):
-    def needed_horo(sign):
-        number = int(msg.text[0])
-        if not number:
-            number = 3
-        else:
-            number -= 1
-        print(number)
-        return today_horoscope[sign][number][1::]
-
     sign_name = sign_names[msg.text]
     db.change_sign(msg.chat.id, sign_name)
-    personal_horoscope = needed_horo(sign_name)
+    personal_horoscope = today_horoscope[sign_name][0]
     today = date.today()
     await msg.answer(text=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
-                     reply_markup=kb.refresh_button(sign_name), parse_mode='html')
+                     reply_markup=kb.refresh_button(sign_name, 0), parse_mode='html')
 
 
 @dp.message(F.text)
@@ -60,19 +51,11 @@ async def trash_recognition(msg: types.Message):
 
 @dp.callback_query(F.data)
 async def get_xml_horoscope(call: types.CallbackQuery):
-    sign_name = call.data
-    personal_horoscope = gotten_horoscope.today_horo[sign_name]
+    sign_name, fragment = call.data.split(' ')
+    personal_horoscope = today_horoscope[sign_name][int(fragment)]
     today = date.today()
-    if call.message.text.startswith(f'{today.day}'):
-        await call.answer(text='Завтра еще не наступило!')
-    else:
-        await call.message.edit_text(text=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
-                                     reply_markup=kb.refresh_button(sign_name), parse_mode='html')
-
-    # await bot.send_message(chat_id=call.message.chat.id,
-    #                        text=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
-    #                        reply_markup=kb.refresh_button(sign_name), parse_mode='html')
-    # await call.message.delete()
+    await call.message.edit_text(text=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
+                                 reply_markup=kb.refresh_button(sign_name, int(fragment)), parse_mode='html')
 
 
 async def main():

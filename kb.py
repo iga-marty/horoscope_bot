@@ -8,6 +8,10 @@ menu_buttons = [[KeyboardButton(text=sign) for sign in row] for row in zodiac]
 menu = ReplyKeyboardMarkup(keyboard=menu_buttons, resize_keyboard=True, one_time_keyboard=True)
 
 
-def refresh_button(sign):
-    button = InlineKeyboardButton(text='Обновить', callback_data=sign)
+def refresh_button(sign, fragment):
+    if fragment == 3:
+        fragment = 0
+    else:
+        fragment += 1
+    button = InlineKeyboardButton(text='Обновить', callback_data=sign + ' ' + str(fragment))
     return InlineKeyboardMarkup(inline_keyboard=[[button]])

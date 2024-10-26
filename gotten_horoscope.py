@@ -14,8 +14,8 @@ signs = ('aries', 'taurus', 'gemini', 'cancer',
          'sagittarius', 'capricorn', 'aquarius', 'pisces')
 
 today_horo = {sign: (
-    '0' + re.search(fr'<{sign}>.+<yesterday>\n(.+)\n</yesterday>.+</{sign}>', text_xml, re.S).group(1),
-    '1' + re.search(fr'<{sign}>.+<today>\n(.+)\n</today>.+</{sign}>', text_xml, re.S).group(1),
-    '2' + re.search(fr'<{sign}>.+<tomorrow>\n(.+)\n</tomorrow>.+</{sign}>', text_xml, re.S).group(1),
-    '3' + re.search(fr'<{sign}>.+<tomorrow02>\n(.+)\n</tomorrow02>.+</{sign}>', text_xml, re.S).group(1)
+    re.search(fr'<{sign}>.+<yesterday>\n(.+)\n</yesterday>.+</{sign}>', text_xml, re.S).group(1),
+    re.search(fr'<{sign}>.+<today>\n(.+)\n</today>.+</{sign}>', text_xml, re.S).group(1),
+    re.search(fr'<{sign}>.+<tomorrow>\n(.+)\n</tomorrow>.+</{sign}>', text_xml, re.S).group(1),
+    re.search(fr'<{sign}>.+<tomorrow02>\n(.+)\n</tomorrow02>.+</{sign}>', text_xml, re.S).group(1)
         ) for sign in signs}
