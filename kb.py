@@ -7,5 +7,7 @@ zodiac = (('\u2648', '\u2649', '\u264A', '\u264B'),
 menu_buttons = [[KeyboardButton(text=sign) for sign in row] for row in zodiac]
 menu = ReplyKeyboardMarkup(keyboard=menu_buttons, resize_keyboard=True, one_time_keyboard=True)
 
-refresh_button = InlineKeyboardButton(text='Обновить', callback_data='refresh')
-refresh = InlineKeyboardMarkup(inline_keyboard=[[refresh_button]])
+
+def refresh_button(sign):
+    button = InlineKeyboardButton(text='Обновить', callback_data=sign)
+    return InlineKeyboardMarkup(inline_keyboard=[[button]])

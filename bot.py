@@ -38,14 +38,19 @@ async def get_horoscope(msg: types.Message):
             db.change_sign(msg.chat.id, sign_name)
         today = date.today()
         await msg.answer(text=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
-                         reply_markup=kb.refresh, parse_mode='html')
+                         reply_markup=kb.refresh_button(sign_name), parse_mode='html')
     except KeyError:
         await msg.answer(text='Неверная команда')
         await start(msg)
 
 
-async def get_xml_horoscope():
-    pass
+@dp.callback_query(F.data)
+async def get_xml_horoscope(call: types.CallbackQuery):
+    sign_name = call.data
+    personal_horoscope = gotten_horoscope.today_horo[sign_name]
+    today = date.today()
+    await call.message.edit_text(text=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
+                                 reply_markup=kb.refresh_button(sign_name), parse_mode='html')
 
 
 async def main():

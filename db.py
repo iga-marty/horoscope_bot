@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-db = SqliteDatabase('db.sqlite')
+db = SqliteDatabase('db2.sqlite')
 
 
 class User(Model):
@@ -17,7 +17,7 @@ class User(Model):
     zodiac_sign = TextField()
 
     class Meta:
-        table_name = 'Users'
+        table_name = 'User'
         database = db
 
 
@@ -37,12 +37,16 @@ Horoscope.create_table()
 
 def create_user(chat_id, sign):
     user, creation_status = User.get_or_create(user_id=chat_id, zodiac_sign=sign)
+    print(user, creation_status)
     return creation_status
 
 
 def change_sign(chat_id, new_sign):
     User.update({User.zodiac_sign: new_sign}).where(User.user_id == chat_id).execute()
 
+
+# def create_horoscope_data(horoscope: dict):
+#     try:
 
 # def wallet_in_database(chat_id):
 #     return False if model_to_dict(User.get(User.user_id == chat_id))['wallet_number'] == '' else True
