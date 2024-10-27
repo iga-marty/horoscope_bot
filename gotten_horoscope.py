@@ -8,13 +8,14 @@ import re
 
 text_xml = requests.get('https://ignio.com/r/export/utf/xml/daily/com.xml').text
 
-signs = ('aries', 'taurus', 'gemini', 'cancer',
-         'leo', 'virgo', 'libra', 'scorpio',
-         'sagittarius', 'capricorn', 'aquarius', 'pisces')
+signs = {'aries': '♈', 'taurus': '♉', 'gemini': '♊', 'cancer': '♋',
+         'leo': '♌', 'virgo': '♍', 'libra': '♎', 'scorpio': '♏',
+         'sagittarius': '♐', 'capricorn': '♑', 'aquarius': '♒', 'pisces': '♓'}
 
-today_horo = {sign: (
-    re.search(fr'<{sign}>.+<yesterday>\n(.+)\n</yesterday>.+</{sign}>', text_xml, re.S).group(1),
-    re.search(fr'<{sign}>.+<today>\n(.+)\n</today>.+</{sign}>', text_xml, re.S).group(1),
-    re.search(fr'<{sign}>.+<tomorrow>\n(.+)\n</tomorrow>.+</{sign}>', text_xml, re.S).group(1),
-    re.search(fr'<{sign}>.+<tomorrow02>\n(.+)\n</tomorrow02>.+</{sign}>', text_xml, re.S).group(1)
-        ) for sign in signs}
+
+today_horo = {sign_smiley: (
+    re.search(fr'<{sign_name}>.+<yesterday>\n(.+)\n</yesterday>.+</{sign_name}>', text_xml, re.S).group(1),
+    re.search(fr'<{sign_name}>.+<today>\n(.+)\n</today>.+</{sign_name}>', text_xml, re.S).group(1),
+    re.search(fr'<{sign_name}>.+<tomorrow>\n(.+)\n</tomorrow>.+</{sign_name}>', text_xml, re.S).group(1),
+    re.search(fr'<{sign_name}>.+<tomorrow02>\n(.+)\n</tomorrow02>.+</{sign_name}>', text_xml, re.S).group(1)
+        ) for sign_name, sign_smiley in signs.items()}
