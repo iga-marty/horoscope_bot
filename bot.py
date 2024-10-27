@@ -57,14 +57,14 @@ async def get_horoscope(msg: Message):
     personal_horoscope = today_horoscope[sign_name][horoscope_number]
     today = date.today()
     last_message = await bot.send_photo(chat_id=chat_id,
-                         photo=sign_names[sign_name],
-                         caption=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
-                         reply_markup=kb.update_button(sign_name))
+                                        photo=sign_names[sign_name],
+                                        caption=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
+                                        reply_markup=kb.update_button(sign_name))
     db.change_last_message_id(last_message.chat.id, last_message.message_id)
 
 
 async def update_horoscope(chat_id, sign_name):
-    horoscope_number = db.get_number(chat_id)                           # костыль: номер гороскопа меняется через базу
+    horoscope_number = db.get_number(chat_id)  # костыль: номер гороскопа меняется через базу
     db.change_number(chat_id, horoscope_number)  # в этих двух строчках
     personal_horoscope = today_horoscope[sign_name][horoscope_number]
     today = date.today()
@@ -87,11 +87,12 @@ async def update(msg: Message):
     chat_id = msg.chat.id
     sign_name = db.get_sign(chat_id)
     await update_horoscope(chat_id, sign_name)
+    await msg.delete()
 
 
 @dp.message(Command('clear_history'))
-async def clear_history():
-    pass
+async def clear_history(msg: Message):
+    await msg.delete()
 
 
 @dp.message(F.text)
