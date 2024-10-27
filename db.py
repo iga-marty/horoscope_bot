@@ -1,42 +1,44 @@
-# import os
-# import asyncio
-
-from peewee import Model, IntegerField, TextField, DateTimeField, SqliteDatabase
+from peewee import Model, IntegerField, TextField, SqliteDatabase
 from playhouse.shortcuts import model_to_dict
-from datetime import datetime, timedelta
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 db = SqliteDatabase('db.sqlite')
 
 
 class User(Model):
-    # user data
     user_id = IntegerField(primary_key=True)
-    zodiac_sign = TextField()
-
+    zodiac_sign = TextField(default='')
 
     class Meta:
-        table_name = 'Users'
+        table_name = 'User'
         database = db
 
 
-class Horoscope(Model):
-    zodiac_sign = TextField(primary_key=True)
-    today_horoscope = TextField(default='')
+# class Horoscope(Model):
+#     zodiac_sign = TextField(primary_key=True)
+#     today_horoscope = TextField(default='')
+#
+#     class Meta:
+#         table_name = 'Horoscope'
+#         database = db
 
 
 cursor = db.cursor()
 User.create_table()
-Horoscope.create_table()
+# Horoscope.create_table()
 
 
-def create_user(chat_id, sign):
-    user, creation_status = User.get_or_create(user_id=chat_id, zodiac_sign=sign)
+def create_user(chat_id):
+    user, creation_status = User.get_or_create(user_id=chat_id)
     return creation_status
 
+
+def change_sign(chat_id, new_sign):
+    User.update({User.zodiac_sign: new_sign}).where(User.user_id == chat_id).execute()
+
+
+# def create_horoscope_data(horoscope: dict):
+#     try:
 
 # def wallet_in_database(chat_id):
 #     return False if model_to_dict(User.get(User.user_id == chat_id))['wallet_number'] == '' else True
