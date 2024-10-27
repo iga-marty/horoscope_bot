@@ -3,7 +3,8 @@ import asyncio
 import logging
 from datetime import date
 
-from aiogram import F, Bot, Dispatcher, types
+from aiogram import F, Bot, Dispatcher
+from aiogram.types import Message, CallbackQuery, BotCommand
 from aiogram.types.input_media_photo import InputMediaPhoto
 from aiogram.filters.command import Command
 from aiogram.client.default import DefaultBotProperties
@@ -42,14 +43,14 @@ today_horoscope = dict(gotten_horoscope.today_horo)
 
 
 @dp.message(Command('start'))
-async def start(msg: types.Message):
+async def start(msg: Message):
     # await msg.delete()
     db.create_user(msg.chat.id)
     await msg.answer(text='Выберите свой знак зодиака:', reply_markup=kb.menu)
 
 
 @dp.message(lambda query: query.text in sign_names.keys())
-async def get_horoscope(msg: types.Message):
+async def get_horoscope(msg: Message):
     sign_name = sign_names[msg.text][0]
     db.change_sign(msg.chat.id, sign_name)
     personal_horoscope = today_horoscope[sign_name][0]
@@ -61,21 +62,31 @@ async def get_horoscope(msg: types.Message):
 
 
 @dp.message(F.text)
-async def trash_recognition(msg: types.Message):
+async def trash_recognition(msg: Message):
     await msg.answer(text='Извините, я не понял')
 
 
 @dp.callback_query(F.data)
-async def update(call: types.CallbackQuery):
+async def update(call: CallbackQuery):
     sign_name, sign, fragment = call.data.split(' ')
     personal_horoscope = today_horoscope[sign_name][int(fragment)]
     today = date.today()
     caption = f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope
     await call.message.edit_media(InputMediaPhoto(media=sign_names[sign][1], caption=caption),
-        reply_markup=kb.update_button(sign_name, sign, int(fragment)))
+                                  reply_markup=kb.update_button(sign_name, sign, int(fragment)))
+
+
+async def main_menu():
+    main_menu_commands = [
+        BotCommand(command='/change_zodiac', description='Выбрать знак зодиака'),
+        BotCommand(command='/update', description='Обновить гороскоп'),
+        BotCommand(command='/clear_history', description='Очистить историю'),
+    ]
+    await bot.set_my_commands(main_menu_commands)
 
 
 async def main():
+    await dp.startup.register(main_menu())
     await dp.start_polling(bot)
 
 
