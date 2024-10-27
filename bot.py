@@ -9,6 +9,7 @@ from aiogram.types.input_media_photo import InputMediaPhoto
 from aiogram.filters.command import Command
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
+from aiogram.exceptions import TelegramBadRequest
 from dotenv import load_dotenv
 
 import db
@@ -47,6 +48,13 @@ async def start(msg: Message):
     db.create_user(msg.chat.id)
     await msg.answer(text='Выберите свой знак зодиака:', reply_markup=kb.menu)
 
+async def send_and_save_message(today, chat_id, sign_name, personal_horoscope):
+    last_message = await bot.send_photo(chat_id=chat_id,
+                                        photo=sign_names[sign_name],
+                                        caption=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
+                                        reply_markup=kb.update_button(sign_name))
+    db.change_last_message_id(chat_id, last_message.message_id)
+
 
 @dp.message(lambda query: query.text in sign_names.keys())
 async def get_horoscope(msg: Message):
@@ -56,11 +64,7 @@ async def get_horoscope(msg: Message):
     db.change_number(chat_id, horoscope_number)
     personal_horoscope = today_horoscope[sign_name][horoscope_number]
     today = date.today()
-    last_message = await bot.send_photo(chat_id=chat_id,
-                                        photo=sign_names[sign_name],
-                                        caption=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
-                                        reply_markup=kb.update_button(sign_name))
-    db.change_last_message_id(last_message.chat.id, last_message.message_id)
+    await send_and_save_message(today, chat_id, sign_name, personal_horoscope)
 
 
 async def update_horoscope(chat_id, sign_name):
@@ -70,10 +74,12 @@ async def update_horoscope(chat_id, sign_name):
     today = date.today()
     caption = f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope
     last_message = db.get_last_message_id(chat_id)
-
-    await bot.edit_message_media(InputMediaPhoto(media=sign_names[sign_name], caption=caption),
-                                 chat_id=chat_id, message_id=last_message,
-                                 reply_markup=kb.update_button(sign_name))
+    try:
+        await bot.edit_message_media(InputMediaPhoto(media=sign_names[sign_name], caption=caption),
+                                     chat_id=chat_id, message_id=last_message,
+                                     reply_markup=kb.update_button(sign_name))
+    except TelegramBadRequest:
+        await send_and_save_message(today, chat_id, sign_name, personal_horoscope)
 
 
 @dp.callback_query(F.data)
