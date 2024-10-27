@@ -37,12 +37,11 @@ sign_names = {
     '♓': ('pisces', 'https://i.artfile.me/wallpaper/04-09-2019/640x480/raznoe-znaki-zodiaka-zodiak-1478077.jpg')
 }
 
-commands = ('/start',)
-
 today_horoscope = dict(gotten_horoscope.today_horo)
 
 
 @dp.message(Command('start'))
+@dp.message(Command('change_zodiac'))
 async def start(msg: Message):
     # await msg.delete()
     db.create_user(msg.chat.id)
@@ -61,11 +60,6 @@ async def get_horoscope(msg: Message):
                          reply_markup=kb.update_button(sign_name, msg.text, 0))
 
 
-@dp.message(F.text)
-async def trash_recognition(msg: Message):
-    await msg.answer(text='Извините, я не понял')
-
-
 @dp.callback_query(F.data)
 async def update(call: CallbackQuery):
     sign_name, sign, fragment = call.data.split(' ')
@@ -74,6 +68,16 @@ async def update(call: CallbackQuery):
     caption = f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope
     await call.message.edit_media(InputMediaPhoto(media=sign_names[sign][1], caption=caption),
                                   reply_markup=kb.update_button(sign_name, sign, int(fragment)))
+
+
+@dp.message(Command('clear_history'))
+async def clear_history():
+    pass
+
+
+@dp.message(F.text)
+async def trash_recognition(msg: Message):
+    await msg.answer(text='Извините, я не понял')
 
 
 async def main_menu():
@@ -86,7 +90,7 @@ async def main_menu():
 
 
 async def main():
-    await dp.startup.register(main_menu())
+    await main_menu()
     await dp.start_polling(bot)
 
 
