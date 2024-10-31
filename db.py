@@ -1,6 +1,5 @@
 from peewee import Model, IntegerField, TextField, SqliteDatabase
 from playhouse.shortcuts import model_to_dict
-from datetime import datetime
 
 db = SqliteDatabase('db.sqlite')
 
@@ -85,7 +84,6 @@ def add_message(message_id, chat_id):
 
 def get_messages(chat_id) -> list:
     query = Messages.select().where(Messages.chat_id == chat_id)
-    print(query.dicts())
     messages = [row['message_id'] for row in query.dicts()]
     return messages
 
@@ -99,12 +97,10 @@ def delete_user_messages(chat_id):
 def get_data_for_notifications() -> dict:
     query = User.select().where(User.zodiac_sign != '').dicts()
     answer = {row['user_id']: row['zodiac_sign'] for row in query}
-    print(5, 'get_data_for_notifications', answer)
     return answer
 
 
 def create_or_update_horo_base(horoscopes: dict):
-    print(4, datetime.now(), 'запись гороскопов в базу')
     for key, value in horoscopes.items():
         Horoscopes.insert(sign=key, horoscope_0=value[0], horoscope_1=value[1], horoscope_2=value[2],
                           horoscope_3=value[3]).on_conflict('replace').execute()

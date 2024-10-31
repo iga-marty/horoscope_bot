@@ -1,4 +1,3 @@
-from datetime import datetime
 import os
 import asyncio
 import logging
@@ -51,12 +50,10 @@ async def start(msg: Message):
 
 
 async def send_and_save_message(today, chat_id, sign_name, personal_horoscope):
-    print(datetime.now(), 'send_and_save_message')
     last_message = await bot.send_photo(chat_id=chat_id,
                                         photo=sign_names[sign_name],
                                         caption=f'<b>{today.day}.{today.month}.{today.year}</b>\n' + personal_horoscope,
                                         reply_markup=kb.update_button(sign_name))
-    print(chat_id, last_message.message_id)
     db.change_last_message_id(chat_id, last_message.message_id)
     db.add_message(last_message.message_id, chat_id)
 
@@ -130,22 +127,17 @@ async def main_menu():
 
 
 async def update_daily_horo():
-    print(2, 'update_daily_horo')
     db.create_or_update_horo_base(gotten_horoscope.horoscopes())
 
 
 async def daily_notifications():
-    print(1, datetime.now(), 'запланированная ебала')
     await update_daily_horo()
     notifications_data = db.get_data_for_notifications()
-    print(5.1, 'daily_notifications', notifications_data)
     if not len(notifications_data) - 1:
         for chat_id, sign in notifications_data.items():
-            print('5.1.1', chat_id, sign)
             await update_horoscope(chat_id, sign)
     else:
         chat_id, sign = list(notifications_data.items())[0]
-        print('5.2.2', chat_id, sign)
         await update_horoscope(chat_id, sign)
 
 
@@ -154,7 +146,7 @@ async def main():
     await update_daily_horo()
 
     scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
-    scheduler.add_job(daily_notifications, 'cron', hour=datetime.now().hour, minute=datetime.now().minute + 1)
+    scheduler.add_job(daily_notifications, 'cron', hour=10)
     scheduler.start()
 
     await dp.start_polling(bot)

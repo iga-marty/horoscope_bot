@@ -4,11 +4,9 @@
 
 import requests
 import re
-from datetime import datetime
 
 
 def horoscopes() -> dict:
-    print(3, datetime.now(), 'запрос, регулярки')
     text_xml = requests.get('https://ignio.com/r/export/utf/xml/daily/com.xml').text
 
     signs = {'aries': '♈', 'taurus': '♉', 'gemini': '♊', 'cancer': '♋',
